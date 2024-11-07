@@ -1,6 +1,5 @@
 import requests
 
-
 def download_file(url):
     filename = url.split('/')[-1]
     r = requests.get(url, stream=True)
@@ -9,7 +8,7 @@ def download_file(url):
             for chunk in r.iter_content(chunk_size=1024):
                 file.write(chunk)
     else:
-        prrint('Ooops! Something wrong!')
+        print('Ooops! Something wrong!')
 
 
 

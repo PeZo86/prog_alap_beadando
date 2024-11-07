@@ -1,28 +1,47 @@
 import pandas as pd
-import numpy as np
 import matplotlib.pyplot as plt
-import seaborn as sns
 
-from sklearn.model_selection import train_test_split
-from pandas.core.common import random_state
-from sklearn.linear_model import LinearRegression
+data = pd.read_csv('files/lak0001.csv')
 
-#Get dataset
-df_sal = pd.read_csv('ele0033.csv')
-df_sal.head()
+def loss_function(m, b, points):
+    total_error = 0
+    for i in range(len(points)):
+        x = points.iloc[i].year
+        y = points.iloc[i].dwelling
+        total_error += (y - (m * x + b)) ** 2
+    total_error / float(len(points))
 
-#describe data
-df_sal.describe()
 
-#data distribution
-plt.title('Salary Distribution Plot')
-sns.distplot(df_sal['Relatív jövedelmi szegénységi arány'])
+def gradient_descent(m_now, b_now, points, L):
+    m_gradient = 0
+    b_gradient = 0
+
+    n = len(points)
+
+    for i in range(n):
+        x = points.iloc[i].year
+        y = points.iloc[i].dwelling
+
+        m_gradient += -(2/n) * x * (y - (m_now * x + b_now))
+        b_gradient += -(2/n) * (y - (m_now * x + b_now))
+
+    m = m_now - m_gradient * L
+    b = b_now - b_gradient * L
+    return m, b
+
+m = 0
+b = 0
+L = 0.0001
+epochs = 200
+
+for i in range(epochs):
+    if i % 50 == 0:
+        print(f"Epoch: {i}")
+    m, b = gradient_descent(m, b, data, L)
+
+print(m, b)
+
+plt.scatter(data.year, data.dwelling, color='blue')
+plt.plot(list(range(1999, 2025)), [m * x + b for x in range(1999, 2025)], color ="red")
 plt.show()
 
-#Relationship
-plt.scatter(df_sal['Referencia év'], df_sal['Relatív jövedelmi szegénységi arány'], color = 'lightcoral')
-plt.title('Salary vs Experience')
-plt.xlabel('Experience')
-plt.ylabel('Salary')
-plt.box(False)
-plt.show()
